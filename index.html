@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Calendar</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <button class="create" id="create">+ Create</button>
+      <div class="mini" id="mini"></div>
+    </aside>
+
+    <main>
+      <header>
+        <button class="btn" id="today">Today</button>
+        <button class="icon-btn" id="prev" aria-label="Previous">‹</button>
+        <button class="icon-btn" id="next" aria-label="Next">›</button>
+        <h1 id="title"></h1>
+        <div class="segmented" role="group" aria-label="View">
+          <button id="view-month" aria-pressed="true">Month</button>
+          <button id="view-week" aria-pressed="false">Week</button>
+        </div>
+        <button class="btn" id="add">+ Event</button>
+      </header>
+      <div id="view"></div>
+    </main>
+  </div>
+
+  <dialog id="dialog">
+    <div class="dialog-body">
+      <input type="text" id="f-title" placeholder="Add title" aria-label="Title" maxlength="80">
+      <div class="row">
+        <label>Date <input type="date" id="f-date"></label>
+        <label>Start <input type="time" id="f-start"></label>
+        <label>End <input type="time" id="f-end"></label>
+      </div>
+      <div class="swatches" id="swatches"></div>
+      <div class="actions">
+        <button class="btn danger" id="f-delete">Delete</button>
+        <button class="btn" id="f-cancel">Cancel</button>
+        <button class="btn primary" id="f-save">Save</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
