@@ -1,7 +1,9 @@
 const STORAGE_KEY = "calendar-events";
+// read from the css variable so the week view and the stylesheet stay in sync
 const HOUR_HEIGHT = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--hour-height"));
 const CLASS_COLOR = "#7c8cff";
 const DUE_COLOR = "#ff3d7f";
+// hardcoded for now, the "upload" just loads this
 const SYLLABUS = {
   file: "syllabus.pdf",
   title: "CS 4352 - Foundations of HCI",
@@ -13,12 +15,14 @@ const SYLLABUS = {
     ["2026-11-22", "DP5 Due"], ["2026-12-13", "DP6 Due"],
   ],
 };
+// events from the syllabus dialog, only saved once the user hits "Add to calendar"
 let pendingEvents = [];
 
 const MONTHS = ["January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+// date is whatever day/week/month we're looking at, not necessarily today
 const state = {
   view: "month",
   date: startOfDay(new Date()),
@@ -27,6 +31,7 @@ const state = {
 
 const $ = (selector) => document.querySelector(selector);
 
+// bad or missing JSON just means an empty calendar
 function loadEvents() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
@@ -35,6 +40,7 @@ function loadEvents() {
   }
 }
 
+// localStorage can throw (private mode, full quota), not worth crashing over
 function saveEvents() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.events));
@@ -55,25 +61,31 @@ function addDays(d, n) {
   return x;
 }
 
+// weeks start on Sunday
 const startOfWeek = (d) => addDays(d, -d.getDay());
 
+// "2026-11-02" style keys, used to match events to days
 const toKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
+// parse by hand, new Date("2026-11-02") would shift a day in US timezones
 function fromKey(key) {
   const [y, m, d] = key.split("-").map(Number);
   return new Date(y, m - 1, d);
 }
 
+// "13:30" -> minutes since midnight
 const toMinutes = (t) => {
   const [h, m] = t.split(":").map(Number);
   return h * 60 + m;
 };
 
+// "13:30" -> "1:30pm", drops the minutes when it's on the hour
 function formatTime(t) {
   const [h, m] = t.split(":").map(Number);
   return `${h % 12 || 12}${m ? ":" + pad(m) : ""}${h < 12 ? "am" : "pm"}`;
 }
 
+// titles go into innerHTML below, so escape them
 function escapeHtml(s) {
   return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 }
@@ -84,6 +96,7 @@ function eventsOn(key) {
     .sort((a, b) => a.start.localeCompare(b.start));
 }
 
+// no framework, just rebuild the whole view whenever something changes
 function render() {
   $("#view-month").setAttribute("aria-pressed", state.view === "month");
   $("#view-week").setAttribute("aria-pressed", state.view === "week");
@@ -97,6 +110,7 @@ function renderMonth() {
   const year = state.date.getFullYear();
   const month = state.date.getMonth();
   const today = toKey(new Date());
+  // always 6 rows (42 days) so the grid doesn't change height between months
   const gridStart = startOfWeek(new Date(year, month, 1));
 
   $("#title").textContent = `${MONTHS[month]} ${year}`;
@@ -113,6 +127,7 @@ function renderMonth() {
 
     html += `<div class="cell${outside}" aria-label="${label}">`;
     html += `<span class="day-num${key === today ? " today" : ""}">${day.getDate()}</span>`;
+    // cells are small, so only show 3 and link the rest to the week view
     html += list.slice(0, 3).map(chipHtml).join("");
     if (list.length > 3) html += `<div class="more" data-week="${key}">${list.length - 3} more</div>`;
     html += "</div>";
@@ -152,9 +167,11 @@ function renderWeek() {
   }
 
   $("#view").innerHTML = html + "</div>";
+  // start scrolled to around 7:30am instead of midnight
   $("#week-scroll").scrollTop = 7.5 * HOUR_HEIGHT;
 }
 
+// weeks that straddle two months get both names, e.g. "Oct - Nov 2026"
 function weekTitle(start, end) {
   if (start.getMonth() === end.getMonth()) return `${MONTHS[start.getMonth()]} ${start.getFullYear()}`;
   return `${MONTHS[start.getMonth()].slice(0, 3)} - ${MONTHS[end.getMonth()].slice(0, 3)} ${end.getFullYear()}`;
@@ -163,6 +180,7 @@ function weekTitle(start, end) {
 function dayColumnHtml(key, isToday) {
   const list = eventsOn(key);
 
+  // overlapping events: put each in the first column that's free, then split the width
   const laneEnds = [];
   const lanes = list.map((e) => {
     let lane = laneEnds.findIndex((end) => end <= toMinutes(e.start));
@@ -173,6 +191,7 @@ function dayColumnHtml(key, isToday) {
   const width = 100 / Math.max(laneEnds.length, 1);
 
   let html = list.map((e, i) => {
+    // position is just minutes converted to pixels; 22px minimum so short events stay clickable
     const top = (toMinutes(e.start) / 60) * HOUR_HEIGHT;
     const height = Math.max(22, ((toMinutes(e.end) - toMinutes(e.start)) / 60) * HOUR_HEIGHT - 2);
     return `<div class="week-event" data-id="${e.id}" ` +
@@ -180,6 +199,7 @@ function dayColumnHtml(key, isToday) {
            `${escapeHtml(e.title)}<small>${formatTime(e.start)} - ${formatTime(e.end)}</small></div>`;
   }).join("");
 
+  // pink line for the current time, only on today's column
   if (isToday) {
     const now = new Date();
     const top = ((now.getHours() * 60 + now.getMinutes()) / 60) * HOUR_HEIGHT;
@@ -212,8 +232,10 @@ function renderMini() {
   $("#mini").innerHTML = html + "</div>";
 }
 
+// turns the syllabus into calendar events: every Tue/Thu class plus the due dates
 function syllabusEvents() {
   const events = [];
+  // semester runs roughly Aug 25 - Dec 10 (months are 0-indexed, so 7 = Aug, 11 = Dec)
   for (let d = new Date(2026, 7, 25); d <= new Date(2026, 11, 10); d = addDays(d, 1)) {
     const key = toKey(d);
     if ((d.getDay() === 2 || d.getDay() === 4) && !SYLLABUS.noClass.includes(key)) {
@@ -221,6 +243,7 @@ function syllabusEvents() {
     }
   }
   SYLLABUS.deadlines.forEach(([date, title]) => {
+    // due dates get a late-night slot since the syllabus only gives a day
     events.push({ id: "syl-due-" + date, title, date, start: "23:00", end: "23:59", color: DUE_COLOR });
   });
   return events;
@@ -237,6 +260,7 @@ function openSyllabus() {
 }
 
 function confirmSyllabus() {
+  // drop old syllabus events first so re-adding doesn't duplicate them
   state.events = state.events.filter((e) => !e.id.startsWith("syl-")).concat(pendingEvents);
   saveEvents();
   $("#syllabus-dialog").close();
@@ -279,6 +303,7 @@ function setView(view) {
   render();
 }
 
+// event wiring
 $("#today").onclick = goToday;
 $("#prev").onclick = () => step(-1);
 $("#next").onclick = () => step(1);
@@ -298,6 +323,7 @@ $("#mini").onclick = (e) => {
   render();
 };
 
+// one listener for the whole view since the contents get rebuilt on every render
 $("#view").onclick = (e) => {
   const event = e.target.closest("[data-id]");
   if (event) return openEvent(event.dataset.id);
@@ -309,6 +335,7 @@ $("#view").onclick = (e) => {
 };
 
 $("#e-close").onclick = () => $("#event-dialog").close();
+// clicking the dark backdrop closes it too
 $("#event-dialog").onclick = (e) => {
   if (e.target === e.currentTarget) e.currentTarget.close();
 };
