@@ -6,7 +6,7 @@ const DUE_COLOR = "#ff3d7f";
 // hardcoded for now, the "upload" just loads this
 const SYLLABUS = {
   file: "syllabus.pdf",
-  title: "CS 4352 - Foundations of HCI",
+  title: "Review syllabus",
   info: "Tue & Thu, 11:30am - 12:45pm, ECSS 2.412",
   noClass: ["2026-11-24", "2026-11-26"],
   deadlines: [
@@ -251,6 +251,8 @@ function syllabusEvents() {
 
 function openSyllabus() {
   pendingEvents = syllabusEvents();
+  // always start on the syllabus step, even if the dialog was last closed on a later one
+  showStep(1);
   const classes = pendingEvents.filter((e) => e.id.startsWith("syl-class")).length;
   $("#s-file").src = SYLLABUS.file;
   $("#s-title").textContent = SYLLABUS.title;
@@ -259,12 +261,22 @@ function openSyllabus() {
   $("#syllabus-dialog").showModal();
 }
 
+// the syllabus dialog is three panels in one <dialog>, only the current one is visible
+function showStep(n) {
+  [1, 2, 3].forEach((i) => { $("#s-step" + i).hidden = i !== n; });
+}
+
 function confirmSyllabus() {
   // drop old syllabus events first so re-adding doesn't duplicate them
   state.events = state.events.filter((e) => !e.id.startsWith("syl-")).concat(pendingEvents);
   saveEvents();
-  $("#syllabus-dialog").close();
   render();
+
+  // don't close yet, step 3 tells the user it worked
+  const classes = pendingEvents.filter((e) => e.id.startsWith("syl-class")).length;
+  $("#s-done").textContent =
+    `${pendingEvents.length} events added: ${classes} class sessions and ${pendingEvents.length - classes} deadlines.`;
+  showStep(3);
 }
 
 function openEvent(id) {
@@ -311,7 +323,10 @@ $("#view-month").onclick = () => setView("month");
 $("#view-week").onclick = () => setView("week");
 
 $("#upload-syllabus").onclick = openSyllabus;
+$("#s-next").onclick = () => showStep(2);
+$("#s-back").onclick = () => showStep(1);
 $("#s-confirm").onclick = confirmSyllabus;
+$("#s-finish").onclick = () => $("#syllabus-dialog").close();
 $("#s-cancel").onclick = () => $("#syllabus-dialog").close();
 
 $("#reset").onclick = resetCalendar;

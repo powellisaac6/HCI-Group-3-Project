@@ -36,14 +36,33 @@
   </div>
 
   <dialog id="syllabus-dialog">
-    <div class="dialog-body">
+    <!-- syllabus -->
+    <div class="dialog-body" id="s-step1">
       <h2 id="s-title"></h2>
       <iframe id="s-file" title="Syllabus preview"></iframe>
+      <div class="actions">
+        <button class="btn" id="s-cancel">Cancel</button>
+        <button class="btn primary" id="s-next">Next</button>
+      </div>
+    </div>
+
+    <!-- syllabus events found -->
+    <div class="dialog-body" id="s-step2" hidden>
+      <h2>CS 4352 - Foundations of HCI</h2>
       <p id="s-info"></p>
       <ul id="s-list"></ul>
       <div class="actions">
-        <button class="btn" id="s-cancel">Cancel</button>
+        <button class="btn" id="s-back">Back</button>
         <button class="btn primary" id="s-confirm">Add to calendar</button>
+      </div>
+    </div>
+
+    <!-- events added to calendar -->
+    <div class="dialog-body" id="s-step3" hidden>
+      <h2>Added to your calendar</h2>
+      <p id="s-done"></p>
+      <div class="actions">
+        <button class="btn primary" id="s-finish">View calendar</button>
       </div>
     </div>
   </dialog>
