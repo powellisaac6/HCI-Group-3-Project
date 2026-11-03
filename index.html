@@ -16,6 +16,8 @@
         <button class="btn" id="upload-syllabus">Upload syllabus</button>
         <button class="btn" id="upload-work">Upload work schedule</button>
       </div>
+      <!-- conflict summary, filled in by renderConflictAlert() in app.js -->
+      <div class="conflict-alert" id="conflict-alert" role="status" aria-live="polite"></div>
       <div class="mini" id="mini"></div>
       <button class="btn" id="reset">Clear calendar</button>
     </aside>
@@ -35,20 +37,21 @@
     </main>
   </div>
 
+  <!-- upload dialog, shared by the syllabus and the work schedule -->
   <dialog id="syllabus-dialog">
-    <!-- syllabus -->
+    <!-- document preview -->
     <div class="dialog-body" id="s-step1">
       <h2 id="s-title"></h2>
-      <iframe id="s-file" title="Syllabus preview"></iframe>
+      <iframe id="s-file" title="Document preview"></iframe>
       <div class="actions">
         <button class="btn" id="s-cancel">Cancel</button>
         <button class="btn primary" id="s-next">Next</button>
       </div>
     </div>
 
-    <!-- syllabus events found -->
+    <!-- events found in the document -->
     <div class="dialog-body" id="s-step2" hidden>
-      <h2>CS 4352 - Foundations of HCI</h2>
+      <h2 id="s-heading"></h2>
       <p id="s-info"></p>
       <ul id="s-list"></ul>
       <div class="actions">
@@ -62,6 +65,7 @@
       <h2>Added to your calendar</h2>
       <p id="s-done"></p>
       <div class="actions">
+        <button class="btn danger" id="s-view-conflicts" hidden>View conflicts</button>
         <button class="btn primary" id="s-finish">View calendar</button>
       </div>
     </div>
@@ -72,8 +76,38 @@
       <h2 id="e-title"></h2>
       <p id="e-date"></p>
       <p id="e-time"></p>
+      <!-- only shown when this event overlaps another one -->
+      <div class="e-conflict" id="e-conflict" hidden>
+        <p id="e-conflict-text"></p>
+        <button class="btn danger" id="e-conflict-view">View conflict</button>
+      </div>
       <div class="actions">
         <button class="btn" id="e-close">Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- conflicts: list of every overlap, then details for one -->
+  <dialog id="conflicts-dialog">
+    <div class="dialog-body" id="c-list-step">
+      <h2>Schedule conflicts</h2>
+      <p id="c-summary"></p>
+      <ul class="c-list" id="c-list"></ul>
+      <div class="actions">
+        <button class="btn" id="c-close">Close</button>
+      </div>
+    </div>
+
+    <div class="dialog-body" id="c-detail-step" hidden>
+      <button class="link-btn" id="c-back">‹ All conflicts</button>
+      <div class="c-banner">
+        <strong>These events overlap</strong>
+        <span id="c-banner-date"></span>
+      </div>
+      <div class="c-cards" id="c-cards"></div>
+      <div class="actions">
+        <button class="btn" id="c-detail-close">Close</button>
+        <button class="btn primary" id="c-show">Show in calendar</button>
       </div>
     </div>
   </dialog>

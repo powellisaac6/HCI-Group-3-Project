@@ -7,6 +7,7 @@
   --muted: #8f97e0;
   --pink: #ff3d7f;
   --teal: #2de2b6;
+  --danger: #ff4d5e;
   --grad: linear-gradient(135deg, #ff3d7f, #ff6a5c);
   --hour-height: 48px;
   color-scheme: dark;
@@ -286,11 +287,149 @@ dialog::backdrop { background: rgba(5, 8, 35, 0.7); }
 
 .actions { display: flex; justify-content: flex-end; gap: 10px; }
 
+/* ---------- schedule conflicts ---------- */
+
+.btn.danger { border: 0; background: var(--danger); color: #fff; }
+
+/* sidebar alert card; .hint / .ok / .danger set the look */
+.conflict-alert {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 26px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.conflict-alert:empty { display: none; }
+.conflict-alert strong { font-size: 15px; }
+.conflict-alert span { color: var(--muted); }
+.conflict-alert .btn { justify-self: start; margin-top: 4px; padding: 7px 16px; }
+.conflict-alert.ok { border-color: color-mix(in srgb, var(--teal) 50%, transparent); }
+.conflict-alert.ok strong { color: var(--teal); }
+.conflict-alert.danger {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 16%, transparent);
+  animation: alert-in 0.35s ease-out;
+}
+.conflict-alert.danger strong { color: #ff8a95; }
+.conflict-alert.danger span { color: var(--text); opacity: 0.85; }
+@keyframes alert-in { from { opacity: 0; transform: translateY(-6px); } }
+
+/* month view: tinted day cell, warning badge, outlined chips */
+.cell { position: relative; }
+.cell.has-conflict { background: color-mix(in srgb, var(--danger) 12%, transparent); }
+.conflict-badge {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--danger);
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+.conflict-badge:hover { filter: brightness(1.2); }
+.chip.conflict { box-shadow: inset 0 0 0 1.5px var(--danger); }
+
+/* week view: red outline on the events and a striped band where they overlap */
+.week-event.conflict { box-shadow: 0 0 0 2px var(--danger); z-index: 1; }
+.overlap-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--danger) 30%, transparent) 0 6px,
+    transparent 6px 12px
+  );
+  border-block: 1.5px dashed var(--danger);
+  /* sits on top of the events but lets clicks through to them */
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* event details: warning box when the event overlaps another */
+.e-conflict {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+}
+.e-conflict[hidden] { display: none; }
+.dialog-body .e-conflict p { color: var(--text); }
+.e-conflict .btn { justify-self: start; }
+
+/* conflicts dialog */
+#conflicts-dialog { width: min(520px, 94vw); }
+.c-list { display: grid; gap: 8px; max-height: 360px; margin: 0; padding: 0; list-style: none; overflow: auto; }
+.c-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--danger);
+  border-radius: 14px;
+  background: var(--panel);
+  text-align: left;
+}
+.c-item:active { transform: scale(0.98); }
+.c-date { font-weight: 700; }
+.c-names { grid-column: 1; color: var(--text); font-size: 14px; }
+.c-names em { color: var(--muted); font-style: normal; }
+.c-time { grid-column: 1; color: #ff8a95; font-size: 13px; }
+.c-arrow { grid-column: 2; grid-row: 1 / 4; align-self: center; color: var(--muted); font-size: 22px; }
+.c-empty { padding: 16px; color: var(--teal); text-align: center; }
+
+.link-btn { justify-self: start; padding: 0; border: 0; background: none; color: var(--teal); font-weight: 600; }
+
+.c-banner {
+  display: grid;
+  gap: 2px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--danger) 22%, transparent);
+  border: 1px solid var(--danger);
+}
+.c-banner strong { font-size: 18px; }
+.c-banner strong::before { content: "⚠ "; }
+.c-banner span { color: var(--text); opacity: 0.85; }
+
+.c-cards { display: grid; gap: 10px; }
+.c-card {
+  display: grid;
+  gap: 2px;
+  padding: 12px 16px;
+  border-left: 4px solid var(--c);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--c) 18%, #10154f);
+}
+.c-card small { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
+.c-card span { color: var(--muted); font-size: 13px; }
+.c-card.overlap {
+  --c: var(--danger);
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--danger) 22%, #10154f) 0 8px,
+    color-mix(in srgb, var(--danger) 12%, #10154f) 8px 16px
+  );
+}
+
 /* narrow layout: sidebar becomes a top bar, mini calendar and logo are hidden */
 @media (max-width: 800px) {
   .app { flex-direction: column; }
   aside { flex-direction: row; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; border: 0; }
-  .brand, .mini { display: none; }
+  .brand, .mini, .conflict-alert span { display: none; }
+  .conflict-alert { margin: 0; padding: 8px 12px; }
+  .conflict-alert .btn { margin: 0; }
   #reset { margin: 0 0 0 auto; }
   .uploads { flex: 1; grid-auto-flow: column; margin: 0; }
   .month-grid { margin: 0 12px 12px; }
