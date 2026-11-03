@@ -1,3 +1,4 @@
+/* colors and the hour height live here; app.js reads --hour-height too */
 :root {
   --bg: #0c1145;
   --panel: rgba(255, 255, 255, 0.06);
@@ -21,6 +22,7 @@ body {
   font: 15px/1.4 "Outfit", system-ui, sans-serif;
 }
 
+/* buttons get a brighten on hover and a little shrink when pressed */
 button {
   font: inherit;
   color: inherit;
@@ -31,6 +33,7 @@ button:hover { filter: brightness(1.25); }
 button:active { transform: scale(0.95); }
 button:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
 
+/* fixed-width sidebar, calendar takes the rest */
 .app { display: flex; height: 100%; }
 
 aside {
@@ -47,6 +50,7 @@ aside {
 
 main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 
+/* lets the week view scroll without stretching the page */
 #view { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 
 header {
@@ -64,6 +68,7 @@ header h1 {
   text-transform: uppercase;
 }
 
+/* shared pill look for buttons and the month/week toggle */
 .btn, .icon-btn, .segmented {
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -71,9 +76,11 @@ header h1 {
 }
 .btn { padding: 8px 18px; font-weight: 600; }
 .btn.primary, #upload-syllabus { border: 0; background: var(--grad); }
+/* margin-top: auto pushes the clear button to the bottom of the sidebar */
 #reset { align-self: flex-start; margin-top: auto; padding: 5px 14px; color: #ff7a9c; font-size: 12px; }
 #upload-work { border-color: var(--teal); color: var(--teal); }
 
+/* the two upload buttons swap their look on hover, so no brightness filter here */
 #upload-syllabus:hover { background: linear-gradient(135deg, #7c8cff, #c06cff); filter: none; }
 #upload-work:hover { background: var(--teal); color: #0c1145; filter: none; }
 
@@ -93,6 +100,7 @@ header h1 {
 .uploads { display: grid; gap: 10px; margin-bottom: 30px; }
 .uploads .btn { padding: 12px 16px; text-align: left; }
 
+/* Sun-Sat header row, reused by the week view */
 .weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -105,6 +113,7 @@ header h1 {
   text-transform: uppercase;
 }
 
+/* 7 columns x 6 rows; minmax(0, 1fr) keeps long chips from stretching a row */
 .month-grid {
   flex: 1;
   display: grid;
@@ -124,6 +133,7 @@ header h1 {
   border-width: 0 1px 1px 0;
   overflow: hidden;
 }
+/* days from the previous/next month */
 .cell.outside { opacity: 0.45; }
 
 .day-num {
@@ -139,6 +149,7 @@ header h1 {
 }
 .day-num.today { background: var(--pink); color: #fff; }
 
+/* event pills in the month view; --c is set inline per event */
 .chip {
   display: flex;
   align-items: center;
@@ -157,6 +168,7 @@ header h1 {
 
 .more { padding: 0 8px; color: var(--muted); font-size: 12px; cursor: pointer; }
 
+/* week view: 56px gutter for the hour labels, then 7 equal day columns */
 .week-head, .week-scroll { grid-template-columns: 56px repeat(7, 1fr); }
 .week-head b {
   font-weight: 600;
@@ -180,9 +192,11 @@ header h1 {
   color: var(--muted);
   font-size: 11px;
   text-align: right;
+  /* nudge labels up so they sit on the hour line instead of under it */
   transform: translateY(-7px);
 }
 
+/* tall column (24 hours) with a gradient drawing the hour lines; events are positioned inside it */
 .day-col {
   position: relative;
   height: calc(var(--hour-height) * 24);
@@ -193,6 +207,7 @@ header h1 {
   );
 }
 
+/* top/height/left/width come from app.js; color-mix tints the event toward the page color */
 .week-event {
   position: absolute;
   padding: 4px 8px;
@@ -207,6 +222,7 @@ header h1 {
 
 .now-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--pink); pointer-events: none; }
 
+/* small month picker in the sidebar */
 .mini h2 { margin: 0 0 10px 4px; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
 .mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; font-size: 12px; text-align: center; }
 .mini-grid span { color: var(--teal); font-weight: 600; }
@@ -215,6 +231,7 @@ header h1 {
 .mini-grid .selected { background: rgba(255, 255, 255, 0.15); }
 .mini-grid .today { background: var(--pink); }
 
+/* both dialogs (syllabus preview and event details) */
 dialog {
   width: min(720px, 94vw);
   padding: 0;
@@ -228,6 +245,7 @@ dialog::backdrop { background: rgba(5, 8, 35, 0.7); }
 .dialog-body { display: grid; gap: 16px; padding: 26px; }
 
 #event-dialog { width: min(380px, 92vw); }
+/* colored dot next to the event title, color is set from js */
 #e-title::before {
   content: "";
   display: inline-block;
@@ -243,8 +261,32 @@ dialog::backdrop { background: rgba(5, 8, 35, 0.7); }
 #s-list { max-height: 130px; margin: 0; padding: 0; list-style: none; overflow: auto; }
 #s-list li { display: flex; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--line); }
 
+/* the hidden attribute loses to display: grid above, so force it for the two dialog steps */
+.dialog-body[hidden] { display: none; }
+
+/* step 2 has the whole dialog to itself now, so the deadline list can be taller */
+#s-step2 #s-list { max-height: 300px; }
+
+/* step 3: smaller, centered dialog with a teal check on top */
+#syllabus-dialog:has(#s-step3:not([hidden])) { width: min(420px, 92vw); }
+#s-step3 { justify-items: center; text-align: center; }
+#s-step3 .actions { justify-content: center; }
+#s-step3 h2::before {
+  content: "\2713";
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: var(--bg);
+  font-size: 30px;
+}
+
 .actions { display: flex; justify-content: flex-end; gap: 10px; }
 
+/* narrow layout: sidebar becomes a top bar, mini calendar and logo are hidden */
 @media (max-width: 800px) {
   .app { flex-direction: column; }
   aside { flex-direction: row; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; border: 0; }
