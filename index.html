@@ -1,117 +1,151 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Shift</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div class="app">
-    <aside>
-      <h2 class="brand">S H I F T</h2>
-      <div class="uploads">
-        <button class="btn" id="upload-syllabus">Upload syllabus</button>
-        <button class="btn" id="upload-work">Upload work schedule</button>
-      </div>
-      <!-- conflict summary, filled in by renderConflictAlert() in app.js -->
-      <div class="conflict-alert" id="conflict-alert" role="status" aria-live="polite"></div>
-      <div class="mini" id="mini"></div>
-      <button class="btn" id="reset">Clear calendar</button>
-    </aside>
-
-    <main>
-      <header>
-        <button class="btn" id="today">Today</button>
-        <button class="icon-btn" id="prev" aria-label="Previous">‹</button>
-        <button class="icon-btn" id="next" aria-label="Next">›</button>
-        <h1 id="title"></h1>
-        <div class="segmented" role="group" aria-label="View">
-          <button id="view-month" aria-pressed="true">Month</button>
-          <button id="view-week" aria-pressed="false">Week</button>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shift</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside>
+        <h2 class="brand">S H I F T</h2>
+        <div class="uploads">
+          <button class="btn" id="upload-syllabus">Upload syllabus</button>
+          <button class="btn" id="upload-work">Upload work schedule</button>
         </div>
-      </header>
-      <div id="view"></div>
-    </main>
-  </div>
+        <!-- conflict summary, filled in by renderConflictAlert() in app.js -->
+        <div
+          class="conflict-alert"
+          id="conflict-alert"
+          role="status"
+          aria-live="polite"
+        ></div>
+        <div class="mini" id="mini"></div>
+        <button class="btn" id="reset">Clear calendar</button>
+      </aside>
 
-  <!-- upload dialog, shared by the syllabus and the work schedule -->
-  <dialog id="syllabus-dialog">
-    <!-- document preview -->
-    <div class="dialog-body" id="s-step1">
-      <h2 id="s-title"></h2>
-      <iframe id="s-file" title="Document preview"></iframe>
-      <div class="actions">
-        <button class="btn" id="s-cancel">Cancel</button>
-        <button class="btn primary" id="s-next">Next</button>
-      </div>
+      <main>
+        <header>
+          <button class="btn" id="today">Today</button>
+          <button class="icon-btn" id="prev" aria-label="Previous">‹</button>
+          <button class="icon-btn" id="next" aria-label="Next">›</button>
+          <h1 id="title"></h1>
+          <div class="segmented" role="group" aria-label="View">
+            <button id="view-month" aria-pressed="true">Month</button>
+            <button id="view-week" aria-pressed="false">Week</button>
+          </div>
+        </header>
+        <div id="view"></div>
+      </main>
     </div>
 
-    <!-- events found in the document -->
-    <div class="dialog-body" id="s-step2" hidden>
-      <h2 id="s-heading"></h2>
-      <p id="s-info"></p>
-      <ul id="s-list"></ul>
-      <div class="actions">
-        <button class="btn" id="s-back">Back</button>
-        <button class="btn primary" id="s-confirm">Add to calendar</button>
+    <!-- upload dialog, shared by the syllabus and the work schedule -->
+    <dialog id="syllabus-dialog">
+      <!-- document preview -->
+      <div class="dialog-body" id="s-step1">
+        <h2 id="s-title"></h2>
+        <iframe id="s-file" title="Document preview"></iframe>
+        <div class="actions">
+          <button class="btn" id="s-cancel">Cancel</button>
+          <button class="btn primary" id="s-next">Next</button>
+        </div>
       </div>
-    </div>
 
-    <!-- events added to calendar -->
-    <div class="dialog-body" id="s-step3" hidden>
-      <h2>Added to your calendar</h2>
-      <p id="s-done"></p>
-      <div class="actions">
-        <button class="btn danger" id="s-view-conflicts" hidden>View conflicts</button>
-        <button class="btn primary" id="s-finish">View calendar</button>
+      <!-- events found in the document -->
+      <div class="dialog-body" id="s-step2" hidden>
+        <h2 id="s-heading"></h2>
+        <p id="s-info"></p>
+        <ul id="s-list"></ul>
+        <div class="actions">
+          <button class="btn" id="s-back">Back</button>
+          <button class="btn primary" id="s-confirm">Add to calendar</button>
+        </div>
       </div>
-    </div>
-  </dialog>
 
-  <dialog id="event-dialog">
-    <div class="dialog-body">
-      <h2 id="e-title"></h2>
-      <p id="e-date"></p>
-      <p id="e-time"></p>
-      <!-- only shown when this event overlaps another one -->
-      <div class="e-conflict" id="e-conflict" hidden>
-        <p id="e-conflict-text"></p>
-        <button class="btn danger" id="e-conflict-view">View conflict</button>
+      <!-- events added to calendar -->
+      <div class="dialog-body" id="s-step3" hidden>
+        <h2>Added to your calendar</h2>
+        <p id="s-done"></p>
+        <div class="actions">
+          <button class="btn danger" id="s-view-conflicts" hidden>
+            View conflicts
+          </button>
+          <button class="btn primary" id="s-finish">View calendar</button>
+        </div>
       </div>
-      <div class="actions">
-        <button class="btn" id="e-close">Close</button>
-      </div>
-    </div>
-  </dialog>
+    </dialog>
 
-  <!-- conflicts: list of every overlap, then details for one -->
-  <dialog id="conflicts-dialog">
-    <div class="dialog-body" id="c-list-step">
-      <h2>Schedule conflicts</h2>
-      <p id="c-summary"></p>
-      <ul class="c-list" id="c-list"></ul>
-      <div class="actions">
-        <button class="btn" id="c-close">Close</button>
-      </div>
-    </div>
+    <dialog id="event-dialog">
+      <!-- 1. Default Event Details -->
+      <div class="dialog-body" id="e-main-step">
+        <h2 id="e-title"></h2>
+        <p id="e-date"></p>
+        <p id="e-time"></p>
 
-    <div class="dialog-body" id="c-detail-step" hidden>
-      <button class="link-btn" id="c-back">‹ All conflicts</button>
-      <div class="c-banner">
-        <strong>These events overlap</strong>
-        <span id="c-banner-date"></span>
-      </div>
-      <div class="c-cards" id="c-cards"></div>
-      <div class="actions">
-        <button class="btn" id="c-detail-close">Close</button>
-        <button class="btn primary" id="c-show">Show in calendar</button>
-      </div>
-    </div>
-  </dialog>
+        <div class="e-conflict" id="e-conflict" hidden>
+          <p id="e-conflict-text"></p>
+          <button class="btn danger" id="e-conflict-view">View conflict</button>
+        </div>
 
-  <script src="app.js"></script>
-</body>
+        <div class="e-mini" id="e-mini" hidden>
+          <p id="e-mini-text"></p>
+          <ul id="e-mini-list"></ul>
+          <button class="btn" id="e-mini-toggle"></button>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="e-close">Close</button>
+        </div>
+      </div>
+
+      <!-- 2. New Preview Step -->
+      <div class="dialog-body" id="e-preview-step" hidden>
+        <h2>Suggested Checkpoints</h2>
+        <p>
+          Here are the checkpoints we found for this deadline, placed in your
+          free time:
+        </p>
+        <ul id="e-preview-list" class="e-mini-list-preview"></ul>
+        <div class="actions">
+          <button class="btn" id="e-preview-cancel">Cancel</button>
+          <button class="btn primary" id="e-preview-confirm">
+            Confirm & Apply
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- conflicts: list of every overlap, then details for one -->
+    <dialog id="conflicts-dialog">
+      <div class="dialog-body" id="c-list-step">
+        <h2>Schedule conflicts</h2>
+        <p id="c-summary"></p>
+        <ul class="c-list" id="c-list"></ul>
+        <div class="actions">
+          <button class="btn" id="c-close">Close</button>
+        </div>
+      </div>
+
+      <div class="dialog-body" id="c-detail-step" hidden>
+        <button class="link-btn" id="c-back">‹ All conflicts</button>
+        <div class="c-banner">
+          <strong>These events overlap</strong>
+          <span id="c-banner-date"></span>
+        </div>
+        <div class="c-cards" id="c-cards"></div>
+        <div class="actions">
+          <button class="btn" id="c-detail-close">Close</button>
+          <button class="btn primary" id="c-show">Show in calendar</button>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
 </html>
