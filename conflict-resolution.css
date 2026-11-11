@@ -1,0 +1,79 @@
+/* Conflict resolution dialogs */
+#resolution-dialog,
+#resolution-success-dialog {
+  width: min(460px, 94vw);
+}
+
+#resolution-form {
+  display: grid;
+  gap: 14px;
+}
+
+#resolution-form label {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}
+
+#resolution-form input {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+}
+
+#resolution-form input:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+#resolution-preview,
+#resolution-error {
+  font-size: 13px;
+}
+
+#resolution-preview {
+  color: var(--teal);
+}
+
+#resolution-error {
+  color: #ff97a2;
+  font-weight: 600;
+}
+
+.resolution-note {
+  font-size: 12px;
+}
+
+/* Success popup */
+.resolution-success-content {
+  justify-items: center;
+  text-align: center;
+}
+
+.resolution-success-content h2 {
+  color: var(--teal);
+}
+
+.resolution-success-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: var(--bg);
+  font-size: 34px;
+  font-weight: 700;
+}
+
+#c-detail-step .actions,
+.resolution-success-content .actions {
+  flex-wrap: wrap;
+}
+
+.resolution-success-content .actions {
+  justify-content: center;
+}
